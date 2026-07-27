@@ -1,9 +1,12 @@
 from analyzer import (
     analizar_documento,
+    generar_id_seccion,
     obtener_secciones,
     construir_estructura,
     mostrar_estructura,
-    obtener_palabras_secciones
+    obtener_palabras_secciones,
+    analizar_secciones,
+    analizar_metricas_secciones
     )
 from config import (
     NOMBRE_PROYECTO,
@@ -69,14 +72,8 @@ def analizar_nueva_version():
         fecha,
         archivo,
         archivo_version,
-        resultado["palabras"],
-        resultado["parrafos"],
-        resultado["tablas"],
-        resultado["figuras"],
-        cambios["palabras"],
-        cambios["parrafos"],
-        cambios["tablas"],
-        cambios["figuras"]
+        resultado,
+        cambios
     )
 
     print()
@@ -232,18 +229,24 @@ def mostrar_menu():
 
 abrir_proyecto()
 
-#ruta_prueba = input("Word para analizar secciones: ")
+"""
+ruta_prueba = input("Word para analizar secciones: ")
 
-#resultado = obtener_palabras_secciones(ruta_prueba)
+secciones = analizar_secciones(ruta_prueba)
 
-#for seccion in resultado:
-#    print(
-#        seccion["titulo"],
-#        "-",
-#        seccion["palabras"],
-#        "palabras"
-#        )
+secciones = analizar_metricas_secciones(
+    ruta_prueba,
+    secciones
+    )
+
+for seccion in secciones:
     
+    print()
+    print(seccion["id"])
+    print(seccion["titulo"])
+    print(seccion["metricas"])
+
+"""
 
 crear_tabla()
 

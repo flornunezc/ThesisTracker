@@ -1,6 +1,6 @@
 import sqlite3
 import os
-from config import DATABASE_PATH
+from config import DATABASE_PATH, METRICAS
 
 
 def conectar():
@@ -55,14 +55,8 @@ def guardar_version_db(
     fecha,
     archivo,
     archivo_version,
-    palabras,
-    parrafos,
-    tablas,
-    figuras,
-    cambio_palabras,
-    cambio_parrafos,
-    cambio_tablas,
-    cambio_figuras
+    metricas,
+    cambios
 ):
     conexion = conectar()
 
@@ -90,14 +84,17 @@ def guardar_version_db(
     (fecha,
      archivo,
      archivo_version,
-     palabras,
-     parrafos,
-     tablas,
-     figuras,
-     cambio_palabras,
-     cambio_parrafos,
-     cambio_tablas,
-     cambio_figuras)
+     
+     metricas["palabras"],
+     metricas["parrafos"],
+     metricas["tablas"],
+     metricas["figuras"],
+     
+     cambios["palabras"],
+     cambios["parrafos"],
+     cambios["tablas"],
+     cambios["figuras"],
+    )
     )
 
     conexion.commit()
@@ -146,22 +143,27 @@ def obtener_ultima_version():
 
 def version_a_diccionario(version):
 
-    return {
+    datos = {
 
         "id": version[0],
         "fecha": version[1],
         "archivo": version[2],
         "archivo_version": version[3],
-        "palabras": version[4],
-        "parrafos": version[5],
-        "tablas": version[6],
-        "figuras": version[7],
-        "cambio_palabras": version[8],
-        "cambio_parrafos": version[9],
-        "cambio_tablas": version[10],
-        "cambio_figuras": version[11]
-
     }
+    
+    inicio_metricas = 4
+    
+    inicio_cambios = inicio_metricas + len(METRICAS)
+    
+    for i, metrica in enumerate(METRICAS):
+        
+        datos[metrica] = version[inicio_metricas + i]
+        
+        datos["cambio_"+metrica] = version[inicio_cambios + i]
+        
+    
+    return datos
+
 
 
 def contar_versiones():
