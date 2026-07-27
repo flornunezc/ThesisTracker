@@ -1,0 +1,14 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Datos del programa
+projects/*/data/
+projects/*/versions/
+
+# Reportes temporales
+reports/
+projects/*/reports/
