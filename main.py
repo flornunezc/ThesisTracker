@@ -9,11 +9,12 @@ from analyzer import (
     analizar_metricas_secciones
     )
 from config import (
-    NOMBRE_PROYECTO,
+    NOMBRE_APP,
     VERSION, AUTOR,
     PROJECT_DIR,
     DATABASE_PATH,
-    METRICAS
+    METRICAS,
+    asegurar_estructura_proyecto
     )
 from file_manager import guardar_version
 from database import (
@@ -29,11 +30,13 @@ from comparator import comparar_metricas, mostrar_cambios
 import os
 from project_manager import abrir_proyecto
 
+asegurar_estructura_proyecto()
+
 def analizar_nueva_version():
 
     print()
-    ruta = input("Pegá la ruta del archivo Word: ")
-
+    ruta = input("Pegá la ruta del archivo Word: ").strip().strip("'\"")
+    
     resultado = analizar_documento(ruta)
     
     ultima = obtener_ultima_version()
@@ -180,7 +183,7 @@ def mostrar_menu():
         
         print()
         print("==================================================")
-        print("                 ", NOMBRE_PROYECTO)
+        print("                 ", NOMBRE_APP)
         print("==================================================")
         print("Autora:", AUTOR)
         print("Versión:", VERSION)
@@ -195,7 +198,7 @@ def mostrar_menu():
         print("1 - Analizar nueva versión")
         print("2 - Ver historial")
         print("3 - Mostrar último análisis")
-        print("4 - Salir")
+        print("4 - Salir de", NOMBRE_APP)
 
         opcion = input("Elegí una opción: ")
 
@@ -217,7 +220,7 @@ def mostrar_menu():
 
         elif opcion == "4":
 
-            print("Cerrando", NOMBRE_PROYECTO, "...")
+            print("Cerrando", NOMBRE_APP, "...")
             break
 
 
@@ -247,6 +250,7 @@ for seccion in secciones:
     print(seccion["metricas"])
 
 """
+
 
 crear_tabla()
 

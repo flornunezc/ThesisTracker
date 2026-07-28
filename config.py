@@ -1,4 +1,4 @@
-NOMBRE_PROYECTO = "ThesisTracker"
+NOMBRE_APP = "ThesisTracker"
 
 VERSION = "0.8"
 
@@ -21,7 +21,9 @@ VERSIONS_DIR = os.path.join(PROJECT_DIR, "versions")
 
 REPORTS_DIR = os.path.join(PROJECT_DIR, "reports")
 
-DATABASE_PATH = os.path.join(PROJECT_DIR, "data", "thesis_tracker.db")
+DATA_DIR = os.path.join(PROJECT_DIR, "data")
+
+DATABASE_PATH = os.path.join(DATA_DIR, "thesis_tracker.db")
 
 METRICAS = {
 
@@ -46,3 +48,11 @@ METRICAS = {
     }
 
 }
+
+
+from pathlib import Path
+
+def asegurar_estructura_proyecto():
+    Path(DATA_DIR).mkdir(parents=True, exist_ok=True)
+    Path(VERSIONS_DIR).mkdir(parents=True, exist_ok=True)
+    Path(REPORTS_DIR).mkdir(parents=True, exist_ok=True)    
