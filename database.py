@@ -1,5 +1,4 @@
 import sqlite3
-import os
 from config import DATABASE_PATH, METRICAS
 
 
@@ -61,6 +60,20 @@ def guardar_version_db(
     conexion = conectar()
 
     cursor = conexion.cursor()
+    
+    valores_metricas = []
+    
+    for metrica in METRICAS:
+        
+        valores_metricas.append(metricas[metrica])
+        
+    
+    valores_cambios = []
+    
+    for metrica in METRICAS:
+        
+        valores_cambios.append(cambios[metrica])
+        
 
     cursor.execute("""
     INSERT INTO versiones
@@ -84,18 +97,10 @@ def guardar_version_db(
     (fecha,
      archivo,
      archivo_version,
-     
-     metricas["palabras"],
-     metricas["parrafos"],
-     metricas["tablas"],
-     metricas["figuras"],
-     
-     cambios["palabras"],
-     cambios["parrafos"],
-     cambios["tablas"],
-     cambios["figuras"],
-    )
-    )
+     *valores_metricas,
+     *valores_cambios
+     )
+     )
 
     conexion.commit()
 

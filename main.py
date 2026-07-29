@@ -1,10 +1,5 @@
 from analyzer import (
     analizar_documento,
-    generar_id_seccion,
-    obtener_secciones,
-    construir_estructura,
-    mostrar_estructura,
-    obtener_palabras_secciones,
     analizar_secciones,
     analizar_metricas_secciones
     )
@@ -100,36 +95,50 @@ def mostrar_historial():
     historial = obtener_historial()
 
     for version in historial:
+        
+        version = version_a_diccionario(version)
 
         print()
         
-        print("Versión:", version[0])
-        print("Fecha:", version[1])
+        print("Versión:", version["id"])
+        print("Fecha:", version["fecha"])
 
         print()
         print("Contenido:")
-        print("Palabras:", version[4])
-        print("Párrafos:", version[5])
-        print("Tablas:", version[6])
-        print("Figuras:", version[7])
-
+        
+        for metrica, info in METRICAS.items():
+            
+            print(
+                f"{info['nombre']}: {version[metrica]}"
+            )
+        
         print()
         
-        if version[0] == 1:
+        if version["id"] == 1:
             
             print("* Primera versión *")
-        
-        elif version[8] == 0 and version[9] == 0 and version[10] == 0 and version[11] == 0:
-
-            print("* Sin cambios desde anterior *")
-
+            
         else:
+            
+            hay_cambios = any(
+                version["cambio_" + metrica] != 0
+                for metrica in METRICAS
+            )
+            
+            if not hay_cambios:
+                
+                print("* Sin cambios desde anterior *")
 
-            print("* Cambios desde anterior *")
-            print("Palabras:", f"{version[8]:+}")
-            print("Párrafos:", f"{version[9]:+}")
-            print("Tablas:", f"{version[10]:+}")
-            print("Figuras:", f"{version[11]:+}")
+            else:
+
+                print("* Cambios desde anterior *")
+                
+                for metrica, info in METRICAS.items():
+                    
+                    print(
+                        f"{info['nombre']}: "
+                        f"{version['cambio_' + metrica]:+}"
+                    )
 
 
         print()
@@ -231,26 +240,6 @@ def mostrar_menu():
 
 
 abrir_proyecto()
-
-"""
-ruta_prueba = input("Word para analizar secciones: ")
-
-secciones = analizar_secciones(ruta_prueba)
-
-secciones = analizar_metricas_secciones(
-    ruta_prueba,
-    secciones
-    )
-
-for seccion in secciones:
-    
-    print()
-    print(seccion["id"])
-    print(seccion["titulo"])
-    print(seccion["metricas"])
-
-"""
-
 
 crear_tabla()
 

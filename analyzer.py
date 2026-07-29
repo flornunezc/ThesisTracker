@@ -287,76 +287,15 @@ def tiene_figura(parrafo):
     return "graphic" in parrafo._p.xml
 
 
-def ver_parrafos_con_figuras(ruta):
 
-    documento = abrir_documento(ruta)
-
-    for i, parrafo in enumerate(documento.paragraphs):
-
-        if "graphic" in parrafo._p.xml:
-
-            print("Figura encontrada en párrafo:", i)
-            print(parrafo.text[:50])
-
-def tiene_tabla(elementeo):
+def tiene_tabla(elemento):
     
     return elemento.tag.endswith("tbl")
 
-"""
-def contar_tablas(ruta):
-    
-    documento = abrir_documento(ruta)
-    
-    return len(documento.tables)
-
-def ver_elementos_documento(ruta):
-
-    documento = abrir_documento(ruta)
-
-    for elemento in documento.element.body:
-
-        print(elemento.tag)
-"""
 
 # ==============================
 #    ANÁLISIS POR SECCIONES
 # ==============================
-                
-def obtener_palabras_secciones(ruta):
-
-    documento = abrir_documento(ruta)
-
-    secciones = []
-
-    seccion_actual = None
-
-    for parrafo in documento.paragraphs:
-
-        nivel = obtener_nivel_estilo(parrafo.style)
-        
-        if nivel is not None:
-
-            seccion_actual = {
-
-                "titulo": parrafo.text,
-                "nivel": nivel,
-                "palabras": 0
-
-            }
-
-            secciones.append(seccion_actual)
-            
-        else:
-
-            if seccion_actual is not None:
-
-                palabras = len(parrafo.text.split())
-
-                seccion_actual["palabras"] += palabras
-                
-    return secciones
-
-
 
 def analizar_secciones(ruta):
 
@@ -421,68 +360,7 @@ def analizar_secciones(ruta):
 
     return secciones
 
-"""
-def probar_figuras_por_parrafo(ruta):
 
-    documento = abrir_documento(ruta)
-
-    for parrafo in documento.paragraphs:
-
-        if "graphic" in parrafo._p.xml:
-
-            print("FIGURA")
-            print("Texto asociado:", parrafo.text[:100])
-"""
-
-"""
-# ESTA VERSION IDENTIFICA BIEN FIGURAS, LA GUARDO POR LAS DUDAS
-
-def analizar_metricas_secciones(ruta, secciones):
-
-    documento = abrir_documento(ruta)
-
-    seccion_actual = None
-
-
-    for parrafo in documento.element.body:
-        
- # primero vemos si tiene figura       
-        if tiene_figura(parrafo):
-            
-            if seccion_actual is not None:
-                
-                seccion_actual["metricas"]["figuras"] += 1
-
-
-        texto = parrafo.text.strip()
-
-  # ignoramos parrafos vacios dsp de revisar figuras
-        if not texto:
-            continue
-
-
-        nivel = obtener_nivel_estilo(parrafo.style)
-
-
-        if nivel is not None:
-
-
-            for seccion in secciones:
-
-                if seccion["titulo"] == texto:
-
-                    seccion_actual = seccion
-                    break
-
-
-    # tablas por ahora
-#    if seccion_actual is not None:
-
-#        seccion_actual["metricas"]["tablas"] = len(documento.tables)
-
-
-    return secciones
-"""
 
 def analizar_metricas_secciones(ruta, secciones):
 
@@ -506,7 +384,7 @@ def analizar_metricas_secciones(ruta, secciones):
         # TABLAS
         # -----------------------
 
-        if elemento.tag.endswith("tbl"):
+        if tiene_tabla(elemento):
 
             if seccion_actual is not None:
 
