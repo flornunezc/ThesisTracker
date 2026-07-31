@@ -1,6 +1,6 @@
 NOMBRE_APP = "ThesisTracker"
 
-VERSION = "0.8"
+VERSION = "0.9"
 
 AUTOR = "Florencia Nunez C"
 
@@ -25,6 +25,8 @@ DATA_DIR = os.path.join(PROJECT_DIR, "data")
 
 DATABASE_PATH = os.path.join(DATA_DIR, "thesis_tracker.db")
 
+PALABRAS_POR_PAGINA = 450
+
 METRICAS = {
 
     "palabras": {
@@ -36,6 +38,11 @@ METRICAS = {
         "nombre": "Párrafos",
         "db": "parrafos"
     },
+    
+    "paginas": {
+        "nombre": "Páginas",
+        "db": "paginas"
+    },
 
     "tablas": {
         "nombre": "Tablas",
@@ -45,6 +52,11 @@ METRICAS = {
     "figuras": {
         "nombre": "Figuras",
         "db": "figuras"
+    },
+    
+    "referencias": {
+        "nombre": "Referencias",
+        "db": "referencias"
     }
 
 }

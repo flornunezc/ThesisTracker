@@ -15,10 +15,12 @@ from file_manager import guardar_version
 from database import (
     crear_tabla,
     guardar_version_db,
+    guardar_secciones_db,
     obtener_historial,
     obtener_ultima_version,
     version_a_diccionario,
-    contar_versiones
+    contar_versiones,
+    obtener_evolucion
     )
 from datetime import datetime
 from comparator import comparar_metricas, mostrar_cambios
@@ -31,6 +33,8 @@ def analizar_nueva_version():
 
     print()
     ruta = input("Pegá la ruta del archivo Word: ").strip().strip("'\"")
+    
+    # METRICAS GLOBALES
     
     resultado = analizar_documento(ruta)
     
@@ -58,6 +62,9 @@ def analizar_nueva_version():
         print()
         print("Esta es la primera version del documento.")
 
+
+    # COPIA DEL WORD 
+
     copia = guardar_version(ruta)
     
     archivo_version = os.path.basename(copia)
@@ -65,18 +72,49 @@ def analizar_nueva_version():
     fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     archivo = os.path.basename(ruta)
+    
+    
+    # GUARDAR VERSION
 
-    guardar_version_db(
+    version_id = guardar_version_db(
         fecha,
         archivo,
         archivo_version,
         resultado,
         cambios
     )
+    
+    
+    # ANALISIS POR SECCIONES
+    
+    secciones = analizar_secciones(ruta)
+    
+    secciones = analizar_metricas_secciones(
+        
+        ruta,
+        secciones
+        
+    )
+    
+    guardar_secciones_db(
+        
+        version_id,
+        secciones
+        
+    )
+    
+  #  print()
+ #   print("Secciones guardadas:")
+
+ #   for fila in obtener_secciones_version(version_id):
+  #      print(fila)
+    
+    
+    # RESUMEN
 
     print()
     print("Versión guardada correctamente:")
-    print(copia)
+    #print(copia)
 
     print()
     print("Métricas totales:")
@@ -93,8 +131,27 @@ def mostrar_historial():
     print("======================")
 
     historial = obtener_historial()
+    
+    ultimas_versiones = 3
+    
+    total_versiones = len(historial)
+    
+    if total_versiones > ultimas_versiones + 1:
+        
+        versiones_mostrar = (
+            [historial[0]] +
+            historial[-ultimas_versiones:]
+        )
+        
+        versiones_ocultas = total_versiones - len(versiones_mostrar)
+        
+    else:
+        
+        versiones_mostrar = historial
+        versiones_ocultas = 0
+        
 
-    for version in historial:
+    for version in versiones_mostrar:
         
         version = version_a_diccionario(version)
 
@@ -143,9 +200,17 @@ def mostrar_historial():
 
         print()
         print("-----------------------------------")
+        
+    
+    if versiones_ocultas > 0:
+        
+        print()
+        print(
+            f"({versiones_ocultas} versiones intermedias ocultas)"
+        )
 
 
-def mostrar_dashboard():
+def mostrar_ultima_version():
 
     ultima = obtener_ultima_version()
 
@@ -183,7 +248,36 @@ def mostrar_dashboard():
         print()
         print("Todavía no hay versiones.")
         
-        
+
+
+def mostrar_evolucion():
+
+    evolucion = obtener_evolucion()
+
+    if not evolucion:
+
+        print()
+        print("Todavía no hay versiones registradas.")
+        return
+
+    print()
+    print("==========================================================")
+    print("              EVOLUCIÓN DEL PROYECTO")
+    print("==========================================================")
+    print()
+
+    for version in evolucion:
+
+        print(f"Versión {version['id']}")
+        print(f"Fecha: {version['fecha']}")
+
+        for metrica, info in METRICAS.items():
+
+            print(f"{info['nombre']:<12}: {version[metrica]}")
+
+        print("-" * 50)
+
+
 
 def mostrar_menu():
 
@@ -205,9 +299,10 @@ def mostrar_menu():
 
         print()
         print("1 - Analizar nueva versión")
-        print("2 - Ver historial")
-        print("3 - Mostrar último análisis")
-        print("4 - Salir de", NOMBRE_APP)
+        print("2 - Mostrar último análisis")
+        print("3 - Ver historial")
+        print("4 - Mostrar evolución")
+        print("5 - Salir de", NOMBRE_APP)
 
         opcion = input("Elegí una opción: ")
 
@@ -219,15 +314,20 @@ def mostrar_menu():
 
         elif opcion == "2":
 
-            mostrar_historial()
+            mostrar_ultima_version()
             
             
         elif opcion == "3":
             
-            mostrar_dashboard()
+            mostrar_historial()
+            
+        
+        elif opcion == "4":
+            
+            mostrar_evolucion()
             
 
-        elif opcion == "4":
+        elif opcion == "5":
 
             print("Cerrando", NOMBRE_APP, "...")
             break
@@ -241,6 +341,8 @@ def mostrar_menu():
 
 abrir_proyecto()
 
+#print("Creando tablas...")
 crear_tabla()
+#print("Tablas creadas")
 
 mostrar_menu()

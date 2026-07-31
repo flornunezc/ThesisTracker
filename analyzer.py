@@ -1,6 +1,6 @@
 from docx import Document
 import re
-from config import METRICAS
+from config import METRICAS, PALABRAS_POR_PAGINA
 
 
 # ==============================
@@ -40,13 +40,22 @@ def analizar_documento(ruta):
     parrafos = len(documento.paragraphs)
     tablas = len(documento.tables)
     figuras = len(documento.inline_shapes)
-
-    resultado = {
-        "palabras": palabras,
-        "parrafos": parrafos,
-        "tablas": tablas,
-        "figuras": figuras
-    }
+    
+    resultado = {}
+    
+    for metrica in METRICAS:
+        
+        resultado[metrica] = 0
+        
+    resultado["palabras"] = palabras
+    resultado["parrafos"] = parrafos
+    resultado["tablas"] = tablas
+    resultado["figuras"] = figuras
+    resultado["paginas"] = max(
+        1,
+        round(resultado["palabras"] / PALABRAS_POR_PAGINA)
+    )
+    resultado["referencias"] = 0 # para mas adelante
 
     return resultado
 

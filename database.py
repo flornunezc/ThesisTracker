@@ -14,7 +14,7 @@ def crear_tabla():
     conexion = conectar()
 
     cursor = conexion.cursor()
-
+    
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS versiones (
 
@@ -29,23 +29,70 @@ def crear_tabla():
         palabras INTEGER,
 
         parrafos INTEGER,
+        
+        paginas INTEGER,
 
         tablas INTEGER,
         
         figuras INTEGER,
         
+        referencias INTEGER,
+        
         cambio_palabras INTEGER,
 
         cambio_parrafos INTEGER,
+        
+        cambio_paginas INTEGER,
 
         cambio_tablas INTEGER,
         
-        cambio_figuras INTEGER
+        cambio_figuras INTEGER,
+        
+        cambio_referencias INTEGER
+
+    )
+    """)
+    
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS secciones (
+
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+        version_id INTEGER,
+
+        seccion_id TEXT,
+    
+        titulo TEXT,
+
+        nivel INTEGER,
+    
+        palabras INTEGER,
+
+        parrafos INTEGER,
+
+        paginas INTEGER,
+
+        tablas INTEGER,
+
+        figuras INTEGER,
+
+        referencias INTEGER,
+
+        FOREIGN KEY (version_id)
+        REFERENCES versiones(id)
 
     )
     """)
 
     conexion.commit()
+    
+    cursor.execute("""
+    SELECT name
+    FROM sqlite_master
+    WHERE type='table'
+    """)
+
+    print(cursor.fetchall())
 
     conexion.close()
     
@@ -83,15 +130,19 @@ def guardar_version_db(
     archivo_version,
     palabras,
     parrafos,
+    paginas,
     tablas,
     figuras,
+    referencias,
     cambio_palabras,
     cambio_parrafos,
+    cambio_paginas,
     cambio_tablas,
-    cambio_figuras
+    cambio_figuras,
+    cambio_referencias
     )
 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 
     """,
     (fecha,
@@ -101,10 +152,87 @@ def guardar_version_db(
      *valores_cambios
      )
      )
+    
+    version_id = cursor.lastrowid
 
     conexion.commit()
 
     conexion.close()
+    
+    return version_id
+
+
+def guardar_secciones_db(
+    version_id,
+    secciones
+):
+
+    conexion = conectar()
+
+    cursor = conexion.cursor()
+
+
+    for seccion in secciones:
+
+
+        valores_metricas = []
+
+        for metrica in METRICAS:
+
+            valores_metricas.append(
+                seccion["metricas"][metrica]
+            )
+
+
+        cursor.execute("""
+        INSERT INTO secciones
+        (
+
+        version_id,
+
+        seccion_id,
+
+        titulo,
+
+        nivel,
+
+        palabras,
+
+        parrafos,
+
+        paginas,
+
+        tablas,
+
+        figuras,
+
+        referencias
+
+        )
+
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+
+        """,
+        (
+
+            version_id,
+
+            seccion["id"],
+
+            seccion["titulo"],
+
+            seccion["nivel"],
+
+            *valores_metricas
+
+        )
+        )
+
+
+    conexion.commit()
+
+    conexion.close()
+    
 
 
 def obtener_historial():
@@ -188,3 +316,50 @@ def contar_versiones():
     
     return cantidad
 
+
+def obtener_evolucion():
+
+    conexion = conectar()
+
+    cursor = conexion.cursor()
+
+    cursor.execute("""
+    SELECT *
+    FROM versiones
+    ORDER BY id
+    """)
+
+    registros = cursor.fetchall()
+
+    conexion.close()
+
+    evolucion = []
+
+    for version in registros:
+
+        evolucion.append(
+            version_a_diccionario(version)
+        )
+
+    return evolucion
+
+
+"""
+def obtener_secciones_version(version_id):
+
+    conexion = conectar()
+
+    cursor = conexion.cursor()
+
+    cursor.execute("""
+#    SELECT *
+#    FROM secciones
+#    WHERE version_id = ?
+#    """, (version_id,))
+"""
+    datos = cursor.fetchall()
+
+    conexion.close()
+
+    return datos
+"""
