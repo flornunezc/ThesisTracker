@@ -13,5 +13,3 @@ Thesis Tracker (versión básica) va a poder leer documentos y comparar las mét
 - porcentaje de cambio de cada sección
 - tiempo desde modificaciones nuevas a la sección
 
-Hasta este momento, sólo permite 1, 3 y 4. Estoy trabajando en lograr 2
-
