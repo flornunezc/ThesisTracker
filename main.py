@@ -26,6 +26,9 @@ from datetime import datetime
 from comparator import comparar_metricas, mostrar_cambios
 import os
 from project_manager import abrir_proyecto
+from stats import preparar_series_temporales
+from visualization import mostrar_grafico_evolucion
+
 
 asegurar_estructura_proyecto()
 
@@ -260,22 +263,9 @@ def mostrar_evolucion():
         print("Todavía no hay versiones registradas.")
         return
 
-    print()
-    print("==========================================================")
-    print("              EVOLUCIÓN DEL PROYECTO")
-    print("==========================================================")
-    print()
-
-    for version in evolucion:
-
-        print(f"Versión {version['id']}")
-        print(f"Fecha: {version['fecha']}")
-
-        for metrica, info in METRICAS.items():
-
-            print(f"{info['nombre']:<12}: {version[metrica]}")
-
-        print("-" * 50)
+    series = preparar_series_temporales(evolucion)
+    
+    mostrar_grafico_evolucion(series)
 
 
 
@@ -341,8 +331,6 @@ def mostrar_menu():
 
 abrir_proyecto()
 
-#print("Creando tablas...")
 crear_tabla()
-#print("Tablas creadas")
 
 mostrar_menu()
