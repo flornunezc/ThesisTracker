@@ -62,6 +62,17 @@ METRICAS = {
 }
 
 
+TITULOS_REFERENCIAS = [
+    "referencias",
+    "referencias bibliográficas",
+    "bibliografía",
+    "bibliografia",
+    "references",
+    "literature cited",
+    "works cited"
+]
+
+
 from pathlib import Path
 
 def asegurar_estructura_proyecto():

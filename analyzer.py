@@ -1,6 +1,6 @@
 from docx import Document
 import re
-from config import METRICAS, PALABRAS_POR_PAGINA
+from config import METRICAS, PALABRAS_POR_PAGINA, TITULOS_REFERENCIAS
 
 
 # ==============================
@@ -40,6 +40,7 @@ def analizar_documento(ruta):
     parrafos = len(documento.paragraphs)
     tablas = len(documento.tables)
     figuras = len(documento.inline_shapes)
+    referencias = contar_referencias(documento)
     
     resultado = {}
     
@@ -55,7 +56,7 @@ def analizar_documento(ruta):
         1,
         round(resultado["palabras"] / PALABRAS_POR_PAGINA)
     )
-    resultado["referencias"] = 0 # para mas adelante
+    resultado["referencias"] = referencias
 
     return resultado
 
@@ -300,6 +301,56 @@ def tiene_figura(parrafo):
 def tiene_tabla(elemento):
     
     return elemento.tag.endswith("tbl")
+
+
+
+def es_titulo_referencias(texto):
+
+    texto = texto.strip().lower()
+
+    return texto in TITULOS_REFERENCIAS
+
+
+def contar_referencias(documento):
+
+    en_bibliografia = False
+    referencias = 0
+
+    for parrafo in documento.paragraphs:
+
+        texto = parrafo.text.strip()
+
+        if not texto:
+            continue
+
+        nivel = obtener_nivel_estilo(parrafo.style)
+
+        # -----------------------
+        # DETECTAR BIBLIOGRAFÍA
+        # -----------------------
+
+        if es_titulo_referencias(texto):
+
+            en_bibliografia = True
+            continue
+
+        # -----------------------
+        # TERMINAR BIBLIOGRAFÍA
+        # -----------------------
+
+        if en_bibliografia and nivel == 0:
+
+            break
+
+        # -----------------------
+        # CONTAR REFERENCIAS
+        # -----------------------
+
+        if en_bibliografia:
+
+            referencias += 1
+
+    return referencias
 
 
 # ==============================

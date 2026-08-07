@@ -1,7 +1,8 @@
 from analyzer import (
     analizar_documento,
     analizar_secciones,
-    analizar_metricas_secciones
+    analizar_metricas_secciones,
+    contar_referencias
     )
 from config import (
     NOMBRE_APP,
