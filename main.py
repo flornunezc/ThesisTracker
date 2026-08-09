@@ -27,7 +27,7 @@ from datetime import datetime
 from comparator import comparar_metricas, mostrar_cambios
 import os
 from project_manager import abrir_proyecto
-from stats import preparar_series_temporales
+from stats import preparar_series_temporales, obtener_metricas_capitulo
 from visualization import mostrar_grafico_evolucion
 
 
@@ -332,6 +332,158 @@ def mostrar_menu():
 
 abrir_proyecto()
 
+from stats import (
+    obtener_estado_tesis,
+    calcular_estadisticas_secciones
+)
+
+
+estado = obtener_estado_tesis()
+
+if estado:
+
+    estadisticas = calcular_estadisticas_secciones(
+        estado["secciones"]
+    )
+
+    print()
+    print("========================================")
+    print("        ESTADO DE LA TESIS")
+    print("========================================")
+
+    print()
+    print("Última versión:", estado["version_id"])
+    print("Fecha:", estado["fecha"])
+
+    print()
+    print("Capítulos:", estadisticas["capitulos"])
+    print("Secciones:", estadisticas["secciones"])
+    print("Subsecciones:", estadisticas["subsecciones"])
+
+    print()
+
+    mas = estadisticas["mas_trabajada"]
+
+    if mas:
+        print(
+            "Más trabajada:",
+            mas[1],
+            "-",
+            mas[3],
+            "palabras"
+        )
+
+    menos = estadisticas["menos_trabajada"]
+
+    if menos:
+        print(
+            "Menos trabajada:",
+            menos[1],
+            "-",
+            menos[3],
+            "palabras"
+        )
+
+
+from database import conectar, obtener_ultima_version
+
+
+ultima = obtener_ultima_version()
+
+if ultima:
+
+    version_id = ultima[0]
+
+    conexion = conectar()
+    cursor = conexion.cursor()
+
+    cursor.execute("""
+    SELECT
+        seccion_id,
+        titulo,
+        nivel,
+        palabras
+    FROM secciones
+    WHERE version_id = ?
+    ORDER BY id
+    """, (version_id,))
+
+    registros = cursor.fetchall()
+
+    conexion.close()
+    
+
+    capitulo_id = "CAP_007"
+
+    indice = None
+
+    for i, seccion in enumerate(registros):
+
+        if seccion[0] == capitulo_id:
+
+            indice = i
+            break
+
+
+    if indice is not None:
+
+        print()
+        print("========================================")
+        print("         CONTENIDO DE", capitulo_id)
+        print("========================================")
+
+        for seccion in registros[indice:]:
+
+            if (
+                seccion[0] != capitulo_id
+                and seccion[2] == 0
+            ):
+                break
+
+            print(
+                seccion[0],
+                "| nivel:",
+                seccion[2],
+                "|",
+                seccion[1],
+                "|",
+                seccion[3],
+                "palabras"
+            )
+
+    else:
+
+        print("No se encontró", capitulo_id)
+    
+        
+
 crear_tabla()
 
+
+from stats import obtener_metricas_capitulo
+
+
+ultima = obtener_ultima_version()
+
+if ultima:
+
+    version_id = ultima[0]
+
+    resultado = obtener_metricas_capitulo(
+        version_id,
+        "CAP_007"
+    )
+
+    print()
+    print("========================================")
+    print("       MÉTRICAS DE CAP_007")
+    print("========================================")
+
+    for metrica, valor in resultado.items():
+
+        print(
+            f"{metrica}: {valor}"
+        )
+        
+        
 mostrar_menu()

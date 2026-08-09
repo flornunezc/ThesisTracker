@@ -73,6 +73,12 @@ TITULOS_REFERENCIAS = [
 ]
 
 
+SECCIONES_EXCLUIDAS_ESTADISTICAS = [
+    TITULOS_REFERENCIAS,
+    "anexos",
+    "anexo"
+]
+
 from pathlib import Path
 
 def asegurar_estructura_proyecto():
