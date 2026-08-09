@@ -1,6 +1,6 @@
 NOMBRE_APP = "ThesisTracker"
 
-VERSION = "0.9"
+VERSION = "0.9.1"
 
 AUTOR = "Florencia Nunez C"
 
@@ -74,9 +74,14 @@ TITULOS_REFERENCIAS = [
 
 
 SECCIONES_EXCLUIDAS_ESTADISTICAS = [
-    TITULOS_REFERENCIAS,
+    "índice",
+    "indice",
+    "índices",
+    "indices",
     "anexos",
-    "anexo"
+    "anexo",
+    "agradecimientos",
+    "dedicatoria"
 ]
 
 from pathlib import Path

@@ -1,4 +1,4 @@
-from config import METRICAS
+from config import METRICAS, TITULOS_REFERENCIAS, SECCIONES_EXCLUIDAS_ESTADISTICAS
 from database import conectar, obtener_ultima_version
 
 
@@ -70,6 +70,42 @@ def obtener_estado_tesis():
     secciones = cursor.fetchall()
 
     conexion.close()
+    
+    
+    # ESTADISTICAS DE LAS SECCIONES
+    
+    estadisticas = calcular_estadisticas_secciones(
+        secciones
+    )
+    
+    
+    # DESCRIBIR MAS Y MENOS TRABAJADAS
+    
+    if estadisticas["mas_trabajada"] is not None:
+        
+        estadisticas["mas_trabajada"] = describir_seccion(
+            estadisticas["mas_trabajada"],
+            secciones
+        )
+        
+    
+    if estadisticas["menos_trabajada"] is not None:
+        
+        estadisticas["menos_trabajada"] = describir_seccion(
+            estadisticas["menos_trabajada"],
+            secciones
+        )
+        
+        
+    # ESTADO POR CAPITULO
+    
+    estado_por_capitulo = obtener_estado_por_capitulo({
+        "version_id": version_id,
+        "secciones": secciones
+    })
+    
+    
+    # RESULTADO FINAL
 
     estado = {
 
@@ -77,11 +113,42 @@ def obtener_estado_tesis():
 
         "fecha": ultima[1],
 
-        "secciones": secciones
+        "secciones": secciones,
+        
+        "estadisticas": estadisticas,
+        
+        "capitulos": estado_por_capitulo
 
     }
 
     return estado
+
+
+
+def es_seccion_relevante(seccion):
+
+    titulo = seccion[1].strip().lower()
+    nivel = seccion[2]
+    palabras = seccion[3]
+
+    if nivel == 0:
+        return False
+
+    if palabras <= 10:
+        return False
+    
+    for titulo_referencia in TITULOS_REFERENCIAS:
+        
+        if titulo_referencia.lower() in titulo:
+            return False
+    
+    for seccion_excluida in SECCIONES_EXCLUIDAS_ESTADISTICAS:
+        
+        if seccion_excluida.lower() in titulo:
+            return False
+    
+    return True
+
 
 
 
@@ -105,22 +172,22 @@ def calcular_estadisticas_secciones(secciones):
             subsecciones += 1
 
 
-    secciones_con_palabras = [
+    secciones_relevantes = [
         seccion
         for seccion in secciones
-        if seccion[3] > 0
+        if es_seccion_relevante(seccion)
     ]
 
 
-    if secciones_con_palabras:
+    if secciones_relevantes:
 
         mas_trabajada = max(
-            secciones_con_palabras,
+            secciones_relevantes,
             key=lambda x: x[3]
         )
 
         menos_trabajada = min(
-            secciones_con_palabras,
+            secciones_relevantes,
             key=lambda x: x[3]
         )
 
@@ -143,6 +210,7 @@ def calcular_estadisticas_secciones(secciones):
         "menos_trabajada": menos_trabajada
 
     }
+
 
 
 def obtener_metricas_capitulo(version_id, capitulo_id):
@@ -268,3 +336,76 @@ def obtener_metricas_capitulo(version_id, capitulo_id):
 
 
     return metricas
+
+
+
+def obtener_estado_por_capitulo(estado):
+
+    version_id = estado["version_id"]
+    secciones = estado["secciones"]
+
+    capitulos = []
+
+    for seccion in secciones:
+
+        # Solo nos interesan los capítulos
+        if seccion[2] != 0:
+            continue
+
+        capitulo_id = seccion[0]
+        titulo = seccion[1]
+
+        metricas = obtener_metricas_capitulo(
+            version_id,
+            capitulo_id
+        )
+
+        capitulos.append({
+            "id": capitulo_id,
+            "titulo": titulo,
+            "metricas": metricas
+        })
+
+    return capitulos
+
+
+
+def obtener_capitulo_de_seccion(secciones, seccion):
+
+    indice_seccion = secciones.index(seccion)
+
+    capitulo = None
+
+    for item in secciones[:indice_seccion + 1]:
+
+        if item[2] == 0:
+
+            capitulo = item
+
+    return capitulo
+
+
+
+def describir_seccion(seccion, secciones):
+
+    if seccion is None:
+        return None
+
+    capitulo = obtener_capitulo_de_seccion(
+        secciones,
+        seccion
+    )
+
+    return {
+
+        "capitulo_id": capitulo[0] if capitulo else None,
+
+        "capitulo": capitulo[1] if capitulo else None,
+
+        "seccion_id": seccion[0],
+
+        "seccion": seccion[1],
+
+        "palabras": seccion[3]
+
+    }

@@ -27,7 +27,12 @@ from datetime import datetime
 from comparator import comparar_metricas, mostrar_cambios
 import os
 from project_manager import abrir_proyecto
-from stats import preparar_series_temporales, obtener_metricas_capitulo
+from stats import (
+    preparar_series_temporales,
+    obtener_metricas_capitulo,
+    obtener_estado_tesis,
+    obtener_estado_por_capitulo
+    )
 from visualization import mostrar_grafico_evolucion
 
 
@@ -294,6 +299,8 @@ def mostrar_menu():
         print("3 - Ver historial")
         print("4 - Mostrar evolución")
         print("5 - Salir de", NOMBRE_APP)
+        print("6 - Probar estado de la tesis")
+
 
         opcion = input("Elegí una opción: ")
 
@@ -316,7 +323,105 @@ def mostrar_menu():
         elif opcion == "4":
             
             mostrar_evolucion()
-            
+        
+        
+        elif opcion == "6":
+
+            estado = obtener_estado_tesis()
+
+            if estado is None:
+
+                print()
+                print("Todavía no hay versiones registradas.")
+
+            else:
+
+                print()
+                print("========================================")
+                print("           ESTADO DE LA TESIS")
+                print("========================================")
+
+                print()
+                print("Versión:", estado["version_id"])
+                print("Fecha:", estado["fecha"])
+
+                print()
+                print("Estadísticas:")
+                print(
+                    "Capítulos:",
+                    estado["estadisticas"]["capitulos"]
+                )
+                print(
+                    "Secciones:",
+                    estado["estadisticas"]["secciones"]
+                )
+                print(
+                    "Subsecciones:",
+                    estado["estadisticas"]["subsecciones"]
+                )
+
+
+                mas = estado["estadisticas"]["mas_trabajada"]
+        
+                if mas:
+
+                    print()
+                    print("Más trabajada:")
+                    print(
+                        mas["capitulo_id"],
+                        "|",
+                        mas["capitulo"]
+                    )
+                    print(
+                        mas["seccion_id"],
+                        "|",
+                        mas["seccion"],
+                        "-",
+                        mas["palabras"],
+                        "palabras"
+                    )
+
+
+                menos = estado["estadisticas"]["menos_trabajada"]
+        
+                if menos:
+
+                    print()
+                    print("Menos trabajada:")
+                    print(
+                        menos["capitulo_id"],
+                        "|",
+                        menos["capitulo"]
+                    )
+                    print(
+                        menos["seccion_id"],
+                        "|",
+                        menos["seccion"],
+                        "-",
+                        menos["palabras"],
+                        "palabras"
+                    )
+
+
+                print()
+                print("Estado por capítulo:")
+
+                for capitulo in estado["capitulos"]:
+
+                    print()
+                    print(
+                        capitulo["id"],
+                        "|",
+                        capitulo["titulo"]
+                    )
+
+                    for metrica, info in METRICAS.items():
+
+                        print(
+                            f"{info['nombre']}: "
+                            f"{capitulo['metricas'][metrica]}"
+                        )
+                
 
         elif opcion == "5":
 
@@ -332,12 +437,7 @@ def mostrar_menu():
 
 abrir_proyecto()
 
-from stats import (
-    obtener_estado_tesis,
-    calcular_estadisticas_secciones
-)
-
-
+"""
 estado = obtener_estado_tesis()
 
 if estado:
@@ -385,8 +485,31 @@ if estado:
         )
 
 
-from database import conectar, obtener_ultima_version
+capitulos = obtener_estado_por_capitulo(estado)
 
+print()
+print("========================================")
+print("          ESTADO POR CAPÍTULO")
+print("========================================")
+
+for capitulo in capitulos:
+
+    print()
+    print(
+        capitulo["id"],
+        "|",
+        capitulo["titulo"]
+    )
+
+    for metrica, info in METRICAS.items():
+
+        print(
+            f"{info['nombre']}: "
+            f"{capitulo['metricas'][metrica]}"
+        )
+"""
+"""
+from database import conectar, obtener_ultima_version
 
 ultima = obtener_ultima_version()
 
@@ -398,16 +521,16 @@ if ultima:
     cursor = conexion.cursor()
 
     cursor.execute("""
-    SELECT
-        seccion_id,
-        titulo,
-        nivel,
-        palabras
-    FROM secciones
-    WHERE version_id = ?
-    ORDER BY id
-    """, (version_id,))
-
+#    SELECT
+#        seccion_id,
+#        titulo,
+#        nivel,
+#        palabras
+#    FROM secciones
+#    WHERE version_id = ?
+#    ORDER BY id
+#    """, (version_id,))
+"""
     registros = cursor.fetchall()
 
     conexion.close()
@@ -454,36 +577,29 @@ if ultima:
     else:
 
         print("No se encontró", capitulo_id)
-    
-        
 
+
+from stats import describir_seccion
+
+seccion_prueba = estadisticas["menos_trabajada"]
+
+descripcion = describir_seccion(
+    seccion_prueba,
+    estado["secciones"]
+)
+
+print()
+print("========================================")
+print("        SECCIÓN MENOS TRABAJADA")
+print("========================================")
+
+print("Capítulo:", descripcion["capitulo_id"])
+print("Título capítulo:", descripcion["capitulo"])
+print("Sección:", descripcion["seccion_id"])
+print("Título sección:", descripcion["seccion"])
+print("Palabras:", descripcion["palabras"])
+        
+"""
 crear_tabla()
-
-
-from stats import obtener_metricas_capitulo
-
-
-ultima = obtener_ultima_version()
-
-if ultima:
-
-    version_id = ultima[0]
-
-    resultado = obtener_metricas_capitulo(
-        version_id,
-        "CAP_007"
-    )
-
-    print()
-    print("========================================")
-    print("       MÉTRICAS DE CAP_007")
-    print("========================================")
-
-    for metrica, valor in resultado.items():
-
-        print(
-            f"{metrica}: {valor}"
-        )
-        
         
 mostrar_menu()
