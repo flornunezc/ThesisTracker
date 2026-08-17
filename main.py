@@ -225,7 +225,7 @@ def mostrar_evolucion():
     mostrar_grafico_evolucion(series)
 
 
-def mostrar_estado_tesis():
+def mostrar_resumen_tesis():
 
     estado = obtener_estado_tesis()
 
@@ -238,14 +238,8 @@ def mostrar_estado_tesis():
 
     print()
     print("========================================")
-    print("           ESTADO DE LA TESIS")
+    print("           RESUMEN DE LA TESIS")
     print("========================================")
-
-# hacer dos menus -resumen de tesis y progreso de tesis
-# resumen: capitulos, secciones, subsecciones, estado por capitulo, etc
-# progreso: secciones mas y menos trabajadas, cambios por seccion, etc
-# mostrar_resumen_tesis()
-# mostrar_progreso_escritura()
 
     print()
     print("Versión:", estado["version_id"])
@@ -253,7 +247,8 @@ def mostrar_estado_tesis():
 
 
     print()
-    print("Estadísticas:")
+    print("Estadísticas")
+    print("----------------------------------------")
 
     print(
         "Capítulos:",
@@ -270,7 +265,59 @@ def mostrar_estado_tesis():
         estado["estadisticas"]["subsecciones"]
     )
 
+# no habria que agregar aca palabras totales?
 
+
+def mostrar_estado_por_capitulo():
+ 
+    estado = obtener_estado_tesis()
+
+    if estado is None:
+
+        print()
+        print("Todavía no hay versiones registradas.")
+        return
+
+
+    print()
+    print("========================================")
+    print("           ESTADO POR CAPÍTULO")
+    print("========================================")
+
+
+    for capitulo in estado["capitulos"]:
+
+        print()
+        print(
+            capitulo["id"],
+            "|",
+            capitulo["titulo"]
+        )
+
+        for metrica, info in METRICAS.items():
+
+            print(
+                f"{info['nombre']}: "
+                f"{capitulo['metricas'][metrica]}"
+            )
+            
+
+def mostrar_progreso_escritura():
+    
+    estado = obtener_estado_tesis()
+
+    if estado is None:
+
+        print()
+        print("Todavía no hay versiones registradas.")
+        return
+
+    print()
+    print("========================================")
+    print("          PROGRESO DE ESCRITURA")
+    print("========================================")
+
+    
     mas = estado["estadisticas"]["mas_trabajada"]
 
     if mas:
@@ -317,25 +364,50 @@ def mostrar_estado_tesis():
         )
 
 
-    print()
-    print("Estado por capítulo:")
+def mostrar_estado_tesis():
 
-    for capitulo in estado["capitulos"]:
+    while True:
 
         print()
-        print(
-            capitulo["id"],
-            "|",
-            capitulo["titulo"]
-        )
+        print("========================================")
+        print("          ESTADO DE LA TESIS")
+        print("========================================")
 
-        for metrica, info in METRICAS.items():
+        print()
+        print("1 - Resumen de la tesis")
+        print("2 - Estado por capítulo")
+        print("3 - Progreso de escritura")
+        print("0 - Volver")
 
-            print(
-                f"{info['nombre']}: "
-                f"{capitulo['metricas'][metrica]}"
-            )
-            
+        print()
+
+        opcion = input("Seleccione una opción: ")
+
+
+        if opcion == "1":
+
+            mostrar_resumen_tesis()
+
+
+        elif opcion == "2":
+
+            mostrar_estado_por_capitulo()
+
+
+        elif opcion == "3":
+
+            mostrar_progreso_escritura()
+
+
+        elif opcion == "0":
+
+            break
+
+
+        else:
+
+            print()
+            print("Opción no válida.")
 
 
 def mostrar_menu():
@@ -401,6 +473,8 @@ def mostrar_menu():
 
 abrir_proyecto()
 
+mostrar_progreso_escritura()
+mostrar_resumen_tesis()
 crear_tabla()
         
 mostrar_menu()
