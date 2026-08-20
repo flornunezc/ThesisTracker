@@ -27,6 +27,8 @@ DATABASE_PATH = os.path.join(DATA_DIR, "thesis_tracker.db")
 
 PALABRAS_POR_PAGINA = 450
 
+MIN_PALABRAS_PROGRESO = 10
+
 METRICAS = {
 
     "palabras": {

@@ -1,4 +1,4 @@
-from config import METRICAS, TITULOS_REFERENCIAS, SECCIONES_EXCLUIDAS_ESTADISTICAS
+from config import METRICAS, TITULOS_REFERENCIAS, SECCIONES_EXCLUIDAS_ESTADISTICAS, MIN_PALABRAS_PROGRESO
 from database import conectar, obtener_ultima_version
 
 
@@ -134,7 +134,7 @@ def es_seccion_relevante(seccion):
     if nivel == 0:
         return False
 
-    if palabras <= 10:
+    if palabras <= MIN_PALABRAS_PROGRESO:
         return False
     
     for titulo_referencia in TITULOS_REFERENCIAS:

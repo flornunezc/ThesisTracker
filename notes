@@ -1,8 +1,12 @@
-agregar "Aún no se han analizado proyectos/archivos" cuando abris historial por primera vez y cambiar "todavia no hay versiones" (de mostrar ultimo analisis) por lo mismo
-
-Identificar referencias
-
 Referencias: actualmente las referencias bibliográficas quedan contabilizadas dentro de parrafos, porque obtener_metricas_capitulo() está sumando directamente las métricas almacenadas en las hojas. Más adelante podemos decidir cómo hacer que las referencias se contabilicen específicamente como referencias cuando corresponda.
+
 Párrafos: hay un párrafo extra en algunos capítulos. No lo tocaría ahora; es mejor corregir el criterio de conteo en analizar_documento()/análisis de secciones cuando hagamos la limpieza, porque no afecta la lógica de agregación.
 
 
+En "Estado por capitulo"
+Agregar capa totales y ahi el estado por cap
+Arreglar paginas (muestra pags 0 para todos)
+Submenu que muestre cada capitulo
+(0-Mostrar todo, 1-cap 1, 2- etc)
+
+En "Progreso de escritura" que también se pueda ver la agrupación de "capitulo mas trabajado", no solo la sección/subseccion mas trabajada

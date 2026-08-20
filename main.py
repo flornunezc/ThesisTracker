@@ -126,30 +126,51 @@ def analizar_nueva_version():
 def mostrar_historial():
 
     print()
-    print("======================")
-    print("Historial de escritura")
-    print("======================")
+    print("============================================")
+    print("           HISTORIAL DE ESCRITURA")
+    print("============================================")
 
     historial = obtener_historial()
     
-    ultimas_versiones = 2
+    if not historial:
+        
+        print()
+        print("Todavía no hay versiones registradas.")
+        return
+    
+    ultimas_versiones = 3
     
     total_versiones = len(historial)
     
-    if total_versiones > ultimas_versiones + 1:
+    print()
+    print(total_versiones, "versiones registradas")
+    
+    primera = version_a_diccionario(historial[0])
+    
+    print()
+    print("Primera versión:")
+    print(
+        f"Versión {primera['id']} | "
+        f"{primera['fecha']}"
+    )
+    
+    ultima = version_a_diccionario(historial[-1])
+
+    print()
+    print("Última versión:")
+    print(
+        f"Versión {ultima['id']} | "
+        f"{ultima['fecha']}"
+    )
+    
         
-        versiones_mostrar = (
-            [historial[0]] +
-            historial[-ultimas_versiones:]
-        )
-        
-        versiones_ocultas = total_versiones - len(versiones_mostrar)
-        
-    else:
-        
-        versiones_mostrar = historial
-        versiones_ocultas = 0
-        
+    versiones_mostrar = historial[-ultimas_versiones:]
+    
+    
+    print()
+    print("---------------------------------")
+    print()
+    print("Últimas versiones:")
 
     for version in versiones_mostrar:
         
@@ -157,57 +178,21 @@ def mostrar_historial():
 
         print()
         
-        print("Versión:", version["id"])
-        print("Fecha:", version["fecha"])
-
-        print()
-        print("Contenido:")
+        print(
+            f"Versión: {version['id']} | "
+            f"Fecha: {version['fecha']}"
+        )
         
         for metrica, info in METRICAS.items():
             
-            print(
-                f"{info['nombre']}: {version[metrica]}"
-            )
-        
-        print()
-        
-        if version["id"] == 1:
+            cambio = version["cambio_" + metrica]
             
-            print("* Primera versión *")
-            
-        else:
-            
-            hay_cambios = any(
-                version["cambio_" + metrica] != 0
-                for metrica in METRICAS
-            )
-            
-            if not hay_cambios:
+            if cambio != 0:
                 
-                print("* Sin cambios desde anterior *")
-
-            else:
-
-                print("* Cambios desde anterior *")
-                
-                for metrica, info in METRICAS.items():
-                    
-                    print(
-                        f"{info['nombre']}: "
-                        f"{version['cambio_' + metrica]:+}"
-                    )
-
-
-        print()
-        print("-----------------------------------")
-        
-    
-    if versiones_ocultas > 0:
-        
-        print()
-        print(
-            f"({versiones_ocultas} versiones intermedias ocultas)"
-        )
+                print(
+                    f"{info['nombre']}: "
+                    f"{cambio:+}"
+                )
 
 
 def mostrar_evolucion():
@@ -247,7 +232,8 @@ def mostrar_resumen_tesis():
 
 
     print()
-    print("Estadísticas")
+    print()
+    print("Estructura")
     print("----------------------------------------")
 
     print(
@@ -264,8 +250,22 @@ def mostrar_resumen_tesis():
         "Subsecciones:",
         estado["estadisticas"]["subsecciones"]
     )
+    
+    print()
+    print()
+    print("Contenido")
+    print("----------------------------------------")
+    
+    ultima = obtener_ultima_version()
+    ultima = version_a_diccionario(ultima)
+    
+    for metrica, info in METRICAS.items():
+        
+        print(
+            f"{info['nombre']}: "
+            f"{ultima[metrica]}"
+        )
 
-# no habria que agregar aca palabras totales?
 
 
 def mostrar_estado_por_capitulo():
@@ -473,8 +473,6 @@ def mostrar_menu():
 
 abrir_proyecto()
 
-mostrar_progreso_escritura()
-mostrar_resumen_tesis()
 crear_tabla()
         
 mostrar_menu()
