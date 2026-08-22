@@ -213,6 +213,58 @@ def calcular_estadisticas_secciones(secciones):
 
 
 
+def calcular_ritmo_versiones(evolucion):
+
+    cambios = []
+
+    for i in range(1, len(evolucion)):
+
+        anterior = evolucion[i - 1]
+        actual = evolucion[i]
+
+        cambio = (
+            actual["palabras"]
+            - anterior["palabras"]
+        )
+
+        cambios.append({
+            "version_anterior": anterior["id"],
+            "version": actual["id"],
+            "cambio_palabras": cambio
+        })
+
+
+    if not cambios:
+
+        return None
+
+
+    promedio = (
+        sum(cambio["cambio_palabras"] for cambio in cambios)
+        / len(cambios)
+    )
+
+
+    mayor = max(
+        cambios,
+        key=lambda x: x["cambio_palabras"]
+    )
+
+    menor = min(
+        cambios,
+        key=lambda x: x["cambio_palabras"]
+    )
+
+
+    return {
+        "cambios": cambios,
+        "promedio": promedio,
+        "mayor": mayor,
+        "menor": menor
+    }
+
+
+
 def obtener_metricas_capitulo(version_id, capitulo_id):
 
     conexion = conectar()

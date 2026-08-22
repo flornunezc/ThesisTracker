@@ -31,9 +31,13 @@ from stats import (
     preparar_series_temporales,
     obtener_metricas_capitulo,
     obtener_estado_tesis,
-    obtener_estado_por_capitulo
+    obtener_estado_por_capitulo,
+    calcular_ritmo_versiones
     )
-from visualization import mostrar_grafico_evolucion
+from visualization import (
+    mostrar_grafico_evolucion,
+    graficar_ritmo_versiones
+    )
 
 
 asegurar_estructura_proyecto()
@@ -195,8 +199,66 @@ def mostrar_historial():
                 )
 
 
-def mostrar_evolucion():
+def mostrar_ritmo_versiones():
 
+    evolucion = obtener_evolucion()
+
+    ritmo = calcular_ritmo_versiones(evolucion)
+
+    if ritmo is None:
+
+        print()
+        print("No hay suficientes versiones para calcular el ritmo.")
+        return
+
+
+    print()
+    print("========================================")
+    print("        RITMO ENTRE VERSIONES")
+    print("========================================")
+
+
+    print()
+    print(
+        "Promedio de palabras por versión:",
+        f"{ritmo['promedio']:+.0f}"
+    )
+
+
+    mayor = ritmo["mayor"]
+
+    print()
+    print("Mayor aumento:")
+    print(
+        f"Versión {mayor['version_anterior']} → "
+        f"{mayor['version']}"
+    )
+    print(
+        f"{mayor['cambio_palabras']:+} palabras"
+    )
+
+
+    menor = ritmo["menor"]
+
+    print()
+    print("Menor aumento:")
+    print(
+        f"Versión {menor['version_anterior']} → "
+        f"{menor['version']}"
+    )
+    print(
+        f"{menor['cambio_palabras']:+} palabras"
+    )
+
+
+    print()
+    graficar_ritmo_versiones(ritmo)
+
+
+
+def mostrar_evolucion():
+    
+           
     evolucion = obtener_evolucion()
 
     if not evolucion:
@@ -205,9 +267,60 @@ def mostrar_evolucion():
         print("Todavía no hay versiones registradas.")
         return
 
-    series = preparar_series_temporales(evolucion)
     
-    mostrar_grafico_evolucion(series)
+    while True:
+        
+        print()
+        print("========================================")
+        print("          EVOLUCIÓN DEL PROYECTO")
+        print("========================================")
+
+        print()
+        print("1 - Evolución temporal")
+        print("2 - Ritmo de escritura")
+        print("3 - Actividad reciente")
+        print("4 - Actividad por período")
+        print("0 - Volver")
+        
+        
+        print()
+        
+        opcion = input("Selecciones una opción: ")
+        
+        
+        if opcion == "1":
+            
+            series = preparar_series_temporales(evolucion)
+    
+            mostrar_grafico_evolucion(series)
+            
+            
+        elif opcion == "2":
+            
+            mostrar_ritmo_versiones()
+            
+            
+        elif opcion == "3":
+            
+            print()
+            print("Esta función todavía esta en desarrollo.")
+            
+            
+        elif opcion == "4":
+            
+            print()
+            print("Esta función todavía esta en desarrollo.")
+        
+        
+        elif opcion == "0":
+            
+            break
+        
+        else:
+            
+            print()
+            print("Opción no válida.")
+            
 
 
 def mostrar_resumen_tesis():
